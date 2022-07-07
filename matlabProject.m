@@ -1,8 +1,7 @@
-% HAKAN ÖZCAN - 13253043
-%Video görüntü aracılığıyla RGB renk tespiti
+%Video gÃ¶rÃ¼ntÃ¼ aracÄ±lÄ±ÄŸÄ±yla RGB renk tespiti
 
-%Renklerin eşik değerlerini(threshold) tanımladım. Bu değerlere daha önce
-%hesaplanmış renk eşiği değerlerinden yardım alarak ulaştım
+%Renklerin eÅŸik deÄŸerlerini(threshold) tanÄ±mladÄ±m. Bu deÄŸerlere daha Ã¶nce
+%hesaplanmÄ±ÅŸ renk eÅŸiÄŸi deÄŸerlerinden yardÄ±m alarak ulaÅŸtÄ±m
 
 
 kirmiziEsik = 0.24;
@@ -10,53 +9,53 @@ yesilEsik = 0.05;
 maviEsik = 0.15; 
 
 
-%kamerayı tanımladık
+%kamerayÄ± tanÄ±mladÄ±k
 
 kamera = imaq.VideoDevice('winvideo', 1, 'YUY2_640x480', ... 
                     'ROI', [1 1 640 480], ...
                     'ReturnedColorSpace', 'rgb');
-video = imaqhwinfo(kamera); % giriş videosunu değişkene atadık
-kare = vision.BlobAnalysis('AreaOutputPort', false, ... %bu noktada yakalanan karelerin büyüklüğü ve sayısını tanımladık
+video = imaqhwinfo(kamera); % giriÅŸ videosunu deÄŸiÅŸkene atadÄ±k
+kare = vision.BlobAnalysis('AreaOutputPort', false, ... %bu noktada yakalanan karelerin bÃ¼yÃ¼klÃ¼ÄŸÃ¼ ve sayÄ±sÄ±nÄ± tanÄ±mladÄ±k
                                 'CentroidOutputPort', true, ... 
                                 'BoundingBoxOutputPort', true', ...
-                                'MinimumBlobArea', 500, ... %bu kısım yakalanan karelerin büyüklüğünün alan bazında tanımlandığı kısım.  500-3000 arasında tuttum tanımlanan bölgeyi
+                                'MinimumBlobArea', 500, ... %bu kÄ±sÄ±m yakalanan karelerin bÃ¼yÃ¼klÃ¼ÄŸÃ¼nÃ¼n alan bazÄ±nda tanÄ±mlandÄ±ÄŸÄ± kÄ±sÄ±m.  500-3000 arasÄ±nda tuttum tanÄ±mlanan bÃ¶lgeyi
                                 'MaximumBlobArea', 3000, ...
-                                'MaximumCount', 10); %en fazla 10 kare yakalasın istiyoruz
-kutu = vision.ShapeInserter('BorderColorSource', 'Input port', ... % sol üstteki sayacı tanımlıyoruz ve içindeki bilgileri giriyoruz
+                                'MaximumCount', 10); %en fazla 10 kare yakalasÄ±n istiyoruz
+kutu = vision.ShapeInserter('BorderColorSource', 'Input port', ... % sol Ã¼stteki sayacÄ± tanÄ±mlÄ±yoruz ve iÃ§indeki bilgileri giriyoruz
                                         'Fill', true, ...
                                         'FillColorSource', 'Input port', ...
                                         'Opacity', 0.4);
 kutuKirmizi = vision.TextInserter('Text', 'Kirmizi : %2d', ... 
                                     'Location',  [5 2], ...
-                                    'Color', [1 0 0], ...  %sayaç bilgisi (kırmızı)
+                                    'Color', [1 0 0], ...  %sayaÃ§ bilgisi (kÄ±rmÄ±zÄ±)
                                     'Font', 'Verdana', ...
                                     'FontSize', 14);
 kutuYesil = vision.TextInserter('Text', 'Yesil : %2d', ... 
                                     'Location',  [5 18], ...
-                                    'Color', [0 1 0], ... %sayaç bilgisi (yesil)
+                                    'Color', [0 1 0], ... %sayaÃ§ bilgisi (yesil)
                                     'Font', 'Verdana', ...
                                     'FontSize', 16);
 kutuMavi = vision.TextInserter('Text', 'Mavi : %2d', ... 
                                     'Location',  [5 34], ...
-                                    'Color', [0 0 1], ... %sayaç bilgisi (mavi)
+                                    'Color', [0 0 1], ... %sayaÃ§ bilgisi (mavi)
                                     'Font', 'Verdana', ...
                                     'FontSize', 16);
-kutuOrta = vision.TextInserter('Text', '+      X:%4d, Y:%4d', ... % bu kısım da nesnenin koordinatlarını gösteriyor
+kutuOrta = vision.TextInserter('Text', '+      X:%4d, Y:%4d', ... % bu kÄ±sÄ±m da nesnenin koordinatlarÄ±nÄ± gÃ¶steriyor
                                     'LocationSource', 'Input port', ...
-                                    'Color', [1 1 0], ... %sarı renk yaptık
+                                    'Color', [1 1 0], ... %sarÄ± renk yaptÄ±k
                                     'Font', 'Courier New', ...
                                     'FontSize', 16);
-input = vision.VideoPlayer('Name', 'Video Renk Tanimlama', ... %çıkış videosunun ayarları
+input = vision.VideoPlayer('Name', 'Video Renk Tanimlama', ... %Ã§Ä±kÄ±ÅŸ videosunun ayarlarÄ±
                                 'Position', [100 100 video.MaxWidth+20 video.MaxHeight+30]);
-fps = 0; % saniyedeki kare sayısını yani fps'yi tanımlıyoruz bir değişkene
+fps = 0; % saniyedeki kare sayÄ±sÄ±nÄ± yani fps'yi tanÄ±mlÄ±yoruz bir deÄŸiÅŸkene
 
-while(fps < 3000) %bu döngüde fps limiti tercihen değiştirilebilir ben uzun süre ekranda kalması için 3000 yaptım. eğer düşük bir rakam tercih edilirse kare sınırı dolduğu zaman döngü biteceği için video donar.
-    kareYakala = step(kamera); % tek kareyi yakaladığımız fonksiyon
-    kareYakala = flip(kareYakala,2); %kareyi göstermek için ayna görüntüsünü aldığımız fonksiyon
+while(fps < 3000) %bu dÃ¶ngÃ¼de fps limiti tercihen deÄŸiÅŸtirilebilir ben uzun sÃ¼re ekranda kalmasÄ± iÃ§in 3000 yaptÄ±m. eÄŸer dÃ¼ÅŸÃ¼k bir rakam tercih edilirse kare sÄ±nÄ±rÄ± dolduÄŸu zaman dÃ¶ngÃ¼ biteceÄŸi iÃ§in video donar.
+    kareYakala = step(kamera); % tek kareyi yakaladÄ±ÄŸÄ±mÄ±z fonksiyon
+    kareYakala = flip(kareYakala,2); %kareyi gÃ¶stermek iÃ§in ayna gÃ¶rÃ¼ntÃ¼sÃ¼nÃ¼ aldÄ±ÄŸÄ±mÄ±z fonksiyon
      
-    kirmiziYakala = imsubtract(kareYakala(:,:,1), rgb2gray(kareYakala)); % görüntünün kırmızı bileşenini aldık
-    kirmiziYakala = medfilt2(kirmiziYakala, [3 3]); % medyan filtreyle gürültü azalttık
-    kirmiziCevir = im2bw(kirmiziYakala, kirmiziEsik); % bu şekilde renk tanımlamasını daha kolay yapabileceğimiz için binary olarak çeviriyoruz 
+    kirmiziYakala = imsubtract(kareYakala(:,:,1), rgb2gray(kareYakala)); % gÃ¶rÃ¼ntÃ¼nÃ¼n kÄ±rmÄ±zÄ± bileÅŸenini aldÄ±k
+    kirmiziYakala = medfilt2(kirmiziYakala, [3 3]); % medyan filtreyle gÃ¼rÃ¼ltÃ¼ azalttÄ±k
+    kirmiziCevir = im2bw(kirmiziYakala, kirmiziEsik); % bu ÅŸekilde renk tanÄ±mlamasÄ±nÄ± daha kolay yapabileceÄŸimiz iÃ§in binary olarak Ã§eviriyoruz 
     
     yesilYakala = imsubtract(kareYakala(:,:,2), rgb2gray(kareYakala)); 
     yesilYakala = medfilt2(yesilYakala, [3 3]); 
@@ -66,8 +65,8 @@ while(fps < 3000) %bu döngüde fps limiti tercihen değiştirilebilir ben uzun süre
     maviYakala = medfilt2(maviYakala, [3 3]); 
     maviCevir = im2bw(maviYakala, maviEsik); 
     
-    [koseKirmizi, sinirKirmizi] = step(kare, kirmiziCevir); % kırmızı rengi yakaladığımızda çıkacak olan şeklin köşeleri ve sınırlarını belirliyoruz
-    koseKirmizi = uint16(koseKirmizi); % daha sonra bunları integer değer olarak döndürüyoruz 
+    [koseKirmizi, sinirKirmizi] = step(kare, kirmiziCevir); % kÄ±rmÄ±zÄ± rengi yakaladÄ±ÄŸÄ±mÄ±zda Ã§Ä±kacak olan ÅŸeklin kÃ¶ÅŸeleri ve sÄ±nÄ±rlarÄ±nÄ± belirliyoruz
+    koseKirmizi = uint16(koseKirmizi); % daha sonra bunlarÄ± integer deÄŸer olarak dÃ¶ndÃ¼rÃ¼yoruz 
     
     [koseYesil, sinirYesil] = step(kare, yesilCevir); 
     koseYesil = uint16(koseYesil); 
@@ -75,26 +74,26 @@ while(fps < 3000) %bu döngüde fps limiti tercihen değiştirilebilir ben uzun süre
     [koseMavi, sinirMavi] = step(kare, maviCevir); 
     koseMavi = uint16(koseMavi); 
     
-    kareYakala(1:60,1:110,:) = 0; %bu kısım sol üstteki sayaç için. belirgin olması için arka planı siyah yaptık 
+    kareYakala(1:60,1:110,:) = 0; %bu kÄ±sÄ±m sol Ã¼stteki sayaÃ§ iÃ§in. belirgin olmasÄ± iÃ§in arka planÄ± siyah yaptÄ±k 
     videoGiris = step(kutu, kareYakala, sinirKirmizi, single([1 0 0])); 
     videoGiris = step(kutu, videoGiris, sinirYesil, single([0 1 0])); 
     videoGiris = step(kutu, videoGiris, sinirMavi, single([0 0 1])); 
-    for object = 1:1:length(sinirKirmizi(:,1)) % kırmızı renge karşılık gelen köşeleri yazıyoruz
+    for object = 1:1:length(sinirKirmizi(:,1)) % kÄ±rmÄ±zÄ± renge karÅŸÄ±lÄ±k gelen kÃ¶ÅŸeleri yazÄ±yoruz
         xKirmizi = koseKirmizi(object,1); yKirmizi = koseKirmizi(object,2);
         videoGiris = step(kutuOrta, videoGiris, [xKirmizi yKirmizi], [xKirmizi-6 yKirmizi-9]); 
     end
-    for object = 1:1:length(sinirYesil(:,1)) % yeşil renge karşılık gelen köşeleri yazıyoruz
+    for object = 1:1:length(sinirYesil(:,1)) % yeÅŸil renge karÅŸÄ±lÄ±k gelen kÃ¶ÅŸeleri yazÄ±yoruz
         xYesil = koseYesil(object,1); yYesil = koseYesil(object,2);
         videoGiris = step(kutuOrta, videoGiris, [xYesil yYesil], [xYesil-6 yYesil-9]); 
     end
-    for object = 1:1:length(sinirMavi(:,1)) % mavi renge karşılık gelen köşeleri yazıyoruz
+    for object = 1:1:length(sinirMavi(:,1)) % mavi renge karÅŸÄ±lÄ±k gelen kÃ¶ÅŸeleri yazÄ±yoruz
         xMavi = koseMavi(object,1); yMavi = koseMavi(object,2);
         videoGiris = step(kutuOrta, videoGiris, [xMavi yMavi], [xMavi-6 yMavi-9]); 
     end
-    videoGiris = step(kutuKirmizi, videoGiris, uint8(length(sinirKirmizi(:,1)))); % bu kısım kırmızı renkleri sayıyor
-    videoGiris = step(kutuYesil, videoGiris, uint8(length(sinirYesil(:,1)))); % yeşil
+    videoGiris = step(kutuKirmizi, videoGiris, uint8(length(sinirKirmizi(:,1)))); % bu kÄ±sÄ±m kÄ±rmÄ±zÄ± renkleri sayÄ±yor
+    videoGiris = step(kutuYesil, videoGiris, uint8(length(sinirYesil(:,1)))); % yeÅŸil
     videoGiris = step(kutuMavi, videoGiris, uint8(length(sinirMavi(:,1)))); % mavi
-    step(input, videoGiris); % çıkış videosu
+    step(input, videoGiris); % Ã§Ä±kÄ±ÅŸ videosu
     fps = fps+1;
 end
 
